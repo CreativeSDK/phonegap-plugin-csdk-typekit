@@ -17,6 +17,8 @@
             </feature>
         </config-file>
 
+        <framework src="com.adobe.creativesdk.foundation:auth:0.9.1186+"/>
+        <framework src="com.adobe.creativesdk:typekit:0.9.1186+"/>
         <source-file src="src/android/Typekit.java" target-dir="src/com/adobe/phonegap/csdk" />
     </platform>
 
