@@ -6,9 +6,9 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
-import android.graphics.Typeface;
 import android.util.Log;
 
 import com.adobe.creativesdk.typekit.AdobeTypekitFont;
@@ -21,7 +21,7 @@ import com.adobe.creativesdk.typekit.UserNotAuthenticatedException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Random;
+import java.util.concurrent.Future;
 
 /**
 * This class exposes methods in Cordova that can be called from JavaScript.
@@ -72,12 +72,33 @@ public class Typekit extends CordovaPlugin implements Observer {
             if (syncList != null) {
                 for (int i=0; i<syncList.size(); i++) {
                     AdobeTypekitFont font = syncList.get(i);
-                    if (font.displayName().equals(fontName)) {
+                    if (font.postscriptName().equals(fontName)) {
                         found = true;
-                        font.getTypeface(new AdobeTypekitFont.ITypekitCallback<Typeface, String>() {
+                        font.getFontFile(new AdobeTypekitFont.ITypekitCallback<java.util.concurrent.Future,java.lang.String>() {
                             @Override
-                            public void onSuccess(AdobeTypekitFont adobeTypekitFont, Typeface typeface) {
-                                callbackContext.success();
+                            public void onSuccess(AdobeTypekitFont adobeTypekitFont, Future future) {
+                                Log.d(LOG_TAG, "download started");
+                            }
+
+                            @Override
+                            public void onError(AdobeTypekitFont adobeTypekitFont, String s) {
+                                callbackContext.error("could not download font");
+                            }
+                        }, new AdobeTypekitFont.ITypekitCallback<AdobeTypekitFont.FontFilePath,java.lang.String>() {
+                            @Override
+                            public void onSuccess(AdobeTypekitFont adobeTypekitFont, AdobeTypekitFont.FontFilePath fontFilePath) {
+                                Log.d(LOG_TAG, "downloaded = " + adobeTypekitFont.isDownloaded());
+                                Log.d(LOG_TAG, "file path = " + fontFilePath.assetFontFilePath);
+                                Log.d(LOG_TAG, "ack = " + fontFilePath.fontFile.getAbsolutePath());
+                                JSONObject jsonObject = new JSONObject();
+                                try {
+                                    jsonObject.put("name", adobeTypekitFont.postscriptName());
+                                    jsonObject.put("downloaded", adobeTypekitFont.isDownloaded());
+                                    jsonObject.put("filePath", "file://" + fontFilePath.fontFile.getAbsolutePath());
+                                } catch (JSONException e) {
+                                    // never happens
+                                }
+                                callbackContext.success(jsonObject);
                             }
 
                             @Override
@@ -85,7 +106,6 @@ public class Typekit extends CordovaPlugin implements Observer {
                                 callbackContext.error("could not download font");
                             }
                         });
-                        callbackContext.success();
                         break;
                     }
                 }
@@ -115,8 +135,8 @@ public class Typekit extends CordovaPlugin implements Observer {
                 JSONArray fontList = new JSONArray();
                 for (int i=0; i<syncList.size(); i++) {
                     AdobeTypekitFont font = syncList.get(i);
-                    fontList.put(font.displayName());
-                    Log.d(LOG_TAG, font.displayName());
+                    fontList.put(font.postscriptName());
+                    Log.d(LOG_TAG, font.postscriptName());
                 }
 
                 mCallbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, fontList));
