@@ -55,13 +55,12 @@ public class Typekit extends CordovaPlugin implements Observer {
                     mTypekitManager.init(this.cordova.getActivity());
                     mTypekitManager.addObserver(this);
                     mTypekitManager.syncFonts();
-                    PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+                    PluginResult pluginResult = new PluginResult(PluginResult.Status.NO_RESULT);
                     pluginResult.setKeepCallback(true);
                     callbackContext.sendPluginResult(pluginResult);
                 } catch (UserNotAuthenticatedException e) {
                     callbackContext.error("user not logged in");
                 }
-                mTypekitManager.syncFonts();
             } else {
                 callbackContext.error("user not logged in");
             }
