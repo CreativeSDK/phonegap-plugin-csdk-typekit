@@ -30,6 +30,11 @@
         </config-file>
         <header-file src="src/ios/CDVTypekit.h" />
         <source-file src="src/ios/CDVTypekit.m" />
+        <resource-file src="src/ios/AdobeCreativeSDKFrameworks/AdobeCreativeSDKTypekit.framework/Versions/A/Resources/AdobeCreativeSDKTypekitResources.bundle"/>
+        <framework src="src/ios/AdobeCreativeSDKFrameworks/AdobeCreativeSDKTypekit.framework" custom="true"/>
+        <resource-file src="src/ios/AdobeCreativeSDKFrameworks/AdobeCreativeSDKCommonUX.framework/Versions/A/Resources/AdobeCreativeSDKCommonUXResources.bundle"/>
+        <framework src="src/ios/AdobeCreativeSDKFrameworks/AdobeCreativeSDKCommonUX.framework" custom="true"/>
+        <framework src="libsqlite3.tbd"/>
     </platform>
 
 </plugin>
